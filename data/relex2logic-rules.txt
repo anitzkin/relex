@@ -9,7 +9,6 @@
 
 [BE] {3} <SVO, SV> _subj(be, $subj) & _obj(be, $obj) => (be-inheritance-rule $subj (get-instance-name $subj word_index sentence_index) $obj (get-instance-name $obj word_index sentence_index))
 
-################## This rule has not been ported to atomese; I haven't been able to get any _%copula output from relex; I think it's gone away.
 [COPULA] {2} <> _subj(_\%copula, $subj) & _obj(_\%copula, $obj) => (be-inheritance-rule $subj (get-instance-name $subj word_index sentence_index) $obj (get-instance-name $obj word_index sentence_index))
 
 [SVIO1] {2} <SVO, SV> _iobj($verb, $iobj) & _obj($verb, $obj) & _subj($verb, $subj) => (SVIO-rule $subj (get-instance-name $subj word_index sentence_index) $verb (get-instance-name $verb word_index sentence_index) $obj (get-instance-name $obj word_index sentence_index) $iobj (get-instance-name $iobj word_index sentence_index))
@@ -144,7 +143,8 @@
 [DEFINITE] {8} <> definite-FLAG($A, T) => (definite-rule $A (get-instance-name $A word_index sentence_index))
 
 ### Also haven't ported this rule yet, partially because i don't know how to do that without using a very long choicelink and partially because the rule seems
-### weird to begin with; it needs to be part of an entire modal system, that needs to be thought out . . .
+### weird to begin with; it needs to be part of an entire modal system, that needs to be thought out . . . and let's note that this rule has never actually been used
+### because boolean operators in this rule file don't work.
 # maybe rule documented on http://wiki.opencog.org/w/RelEx2Logic_Rules#Maybe_Rule
 # Example: "Maybe she eats lunch.", "Perhaps she is nice."
 [MAYBE] {3} <ADVMOD> _advmod($x, (maybe|possibly|perhaps|probably)) => (maybe-rule $x (get-instance-name $x word_index sentence_index))
@@ -188,7 +188,7 @@
 # Example: "She must be able to sing."
 [TODO4] {1} <TODO3> _to-do(able, $V1) & _predadj($V2, able) => (to-do-rule-4 $V1 (get-instance-name $V1 word_index sentence_index) $V2 (get-instance-name $V2 word_index sentence_index))
 
-#################### What about the SVO, SVIO, be and prep versions of this? Not ported yet.
+#################### What about the SVO, SVIO, be and prep versions of this?
 # Example: "She is nice to help with the project."
 [TODO3] {2} <TODO4> _to-do($V1, $V2) & _predadj($V3, $V1) => (to-do-rule-3 $V1 (get-instance-name $V1 word_index sentence_index) $V2 (get-instance-name $V2 word_index sentence_index) $V3 (get-instance-name $V3 word_index sentence_index))
 
@@ -201,8 +201,7 @@
 # "All Canadians write."
 # "All right-handed Canadians write."
 # ============================================
-########### I also have not ported these two rules because the first one is already handled by the general quantity-rule and the second one has no scheme helper yet, and seems like
-########### it should be handled by a general "predeterminer" rule anyway.
+########### I also have not ported these two rules because all is handled by the quantity-rule, and I don't know what a predeterminer is or how to make one appear on relex . . . 
 
 [ALLRULE1] {1} <> _quantity($noun, all) => (all-rule (get-instance-name $noun word_index sentence_index))
 
@@ -214,6 +213,11 @@
 # passive verb rules
 # ============================================
 
+######################################################### I'm not sure about these rules; it doesn't quite make sense to me the idea that you should make the un-mentioned agent of a 
+######################################################### passive verb into a qVar.  Shouldn't that be left for PLN to deduce -- to deduce that there may be an unknown agent?  I mean,
+######################################################### otherwise, why isn't every un-used predicate-argument slot a qVar?  If I say, "Jo0hn is eating." Should the un-mentioned object
+######################################################### of eat be a qVar too?
+
 [PASSIVE1] {1} <PASSIVE2> _obj($A,$B) & by($A,$C) & tense($A, (.*)passive) => (passive-rule1 $A (get-instance-name $A word_index sentence_index) $B (get-instance-name $B word_index sentence_index) $C (get-instance-name $C word_index sentence_index))
 
 [PASSIVE2] {1} <PASSIVE1> _obj($A,$B) & tense($A, (.*)passive) => (passive-rule2 $A (get-instance-name $A word_index sentence_index) $B (get-instance-name $B word_index sentence_index))
@@ -223,6 +227,7 @@
 # ============================================
 # Example: "I did my homework, and I went to school."
 # Example: "John and Madison eat the cake."
+
 [AND] {1} <> conj_and($var1, $var2) & pos($var1, $pos) & pos($var2, $pos) => (and-rule $var1 (get-instance-name $var1 word_index sentence_index) $var2 (get-instance-name $var2 word_index sentence_index) $pos)
 
 [BUT] {1} <> conj_but($var1, $var2) & pos($var1, $pos) & pos($var2, $pos) => (but-rule $var1 (get-instance-name $var1 word_index sentence_index) $var2 (get-instance-name $var2 word_index sentence_index) $pos)
@@ -243,6 +248,7 @@
 # ============================================
 # time rules for dealing with temporal expressions
 # ============================================
+############################################ I didn't port these rules, because they seem to be superceded by the rules that already handle _%atTime, _pobj, _advmod relations.#################
 [BEFORE] {100} <> before($subj, $verb) & pos($verb, $verb_pos) => (before-after-rule (get-instance-name $subj word_index sentence_index) (get-instance-name $verb word_index sentence_index) $verb_pos "before")
 [AFTER] {100} <> after($subj, $verb) & pos($verb, $verb_pos) => (before-after-rule (get-instance-name $subj word_index sentence_index) (get-instance-name $verb word_index sentence_index) $verb_pos "after")
 [TIME] {100} <> _time($period, $hour) & at($verb, $period) => (time-rule $hour $period (get-instance-name $verb word_index sentence_index))
